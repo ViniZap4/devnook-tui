@@ -45,7 +45,7 @@ func (m Model) Init() tea.Cmd {
 	if m.config.Token != "" {
 		return m.fetchDashboard()
 	}
-	return m.login.Init()
+	return checkSetup(m.client)
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
