@@ -67,6 +67,37 @@ type Shortcut struct {
 	Color   string `json:"color"`
 }
 
+type SetupStatus struct {
+	NeedsSetup bool `json:"needs_setup"`
+}
+
+func (c *Client) CheckSetup() (bool, error) {
+	resp, err := c.get("/api/v1/auth/setup")
+	if err != nil {
+		return false, err
+	}
+	var s SetupStatus
+	if err := json.Unmarshal(resp, &s); err != nil {
+		return false, err
+	}
+	return s.NeedsSetup, nil
+}
+
+func (c *Client) Setup(username, email, password, fullName string) (string, error) {
+	resp, err := c.post("/api/v1/auth/setup", RegisterRequest{
+		Username: username, Email: email, Password: password, FullName: fullName,
+	})
+	if err != nil {
+		return "", err
+	}
+	var tok TokenResponse
+	if err := json.Unmarshal(resp, &tok); err != nil {
+		return "", err
+	}
+	c.token = tok.Token
+	return tok.Token, nil
+}
+
 func (c *Client) Login(username, password string) (string, error) {
 	resp, err := c.post("/api/v1/auth/login", LoginRequest{Username: username, Password: password})
 	if err != nil {
