@@ -63,6 +63,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case loginSuccessMsg:
 		m.config.Token = msg.token
 		m.config.Save()
+		m.dashboard.user = msg.user
 		m.view = dashboardView
 		return m, m.fetchDashboard()
 
@@ -99,7 +100,10 @@ func (m Model) View() string {
 }
 
 // Messages
-type loginSuccessMsg struct{ token string }
+type loginSuccessMsg struct {
+	token string
+	user  *api.User
+}
 type errMsg struct{ err error }
 
 type dashboardDataMsg struct {
