@@ -6,14 +6,21 @@ type User struct {
 	Email     string `json:"email"`
 	FullName  string `json:"full_name"`
 	AvatarURL string `json:"avatar_url"`
+	IsAdmin   bool   `json:"is_admin"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
 }
 
 type Repo struct {
-	ID          int64  `json:"id"`
-	Owner       string `json:"owner"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	IsPrivate   bool   `json:"is_private"`
+	ID            int64  `json:"id"`
+	Owner         string `json:"owner"`
+	Name          string `json:"name"`
+	Description   string `json:"description"`
+	IsPrivate     bool   `json:"is_private"`
+	DefaultBranch string `json:"default_branch"`
+	OrgID         *int64 `json:"org_id"`
+	CreatedAt     string `json:"created_at"`
+	UpdatedAt     string `json:"updated_at"`
 }
 
 type Shortcut struct {

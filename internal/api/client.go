@@ -39,8 +39,9 @@ type RegisterRequest struct {
 	FullName string `json:"full_name"`
 }
 
-type TokenResponse struct {
+type AuthResponse struct {
 	Token string `json:"token"`
+	User  User   `json:"user"`
 }
 
 type User struct {
@@ -49,14 +50,21 @@ type User struct {
 	Email     string `json:"email"`
 	FullName  string `json:"full_name"`
 	AvatarURL string `json:"avatar_url"`
+	IsAdmin   bool   `json:"is_admin"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
 }
 
 type Repo struct {
-	ID          int64  `json:"id"`
-	Owner       string `json:"owner"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	IsPrivate   bool   `json:"is_private"`
+	ID            int64  `json:"id"`
+	Owner         string `json:"owner"`
+	Name          string `json:"name"`
+	Description   string `json:"description"`
+	IsPrivate     bool   `json:"is_private"`
+	DefaultBranch string `json:"default_branch"`
+	OrgID         *int64 `json:"org_id"`
+	CreatedAt     string `json:"created_at"`
+	UpdatedAt     string `json:"updated_at"`
 }
 
 type Shortcut struct {
@@ -83,47 +91,47 @@ func (c *Client) CheckSetup() (bool, error) {
 	return s.NeedsSetup, nil
 }
 
-func (c *Client) Setup(username, email, password, fullName string) (string, error) {
+func (c *Client) Setup(username, email, password, fullName string) (*AuthResponse, error) {
 	resp, err := c.post("/api/v1/auth/setup", RegisterRequest{
 		Username: username, Email: email, Password: password, FullName: fullName,
 	})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	var tok TokenResponse
-	if err := json.Unmarshal(resp, &tok); err != nil {
-		return "", err
+	var auth AuthResponse
+	if err := json.Unmarshal(resp, &auth); err != nil {
+		return nil, err
 	}
-	c.token = tok.Token
-	return tok.Token, nil
+	c.token = auth.Token
+	return &auth, nil
 }
 
-func (c *Client) Login(username, password string) (string, error) {
+func (c *Client) Login(username, password string) (*AuthResponse, error) {
 	resp, err := c.post("/api/v1/auth/login", LoginRequest{Username: username, Password: password})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	var tok TokenResponse
-	if err := json.Unmarshal(resp, &tok); err != nil {
-		return "", err
+	var auth AuthResponse
+	if err := json.Unmarshal(resp, &auth); err != nil {
+		return nil, err
 	}
-	c.token = tok.Token
-	return tok.Token, nil
+	c.token = auth.Token
+	return &auth, nil
 }
 
-func (c *Client) Register(username, email, password, fullName string) (string, error) {
+func (c *Client) Register(username, email, password, fullName string) (*AuthResponse, error) {
 	resp, err := c.post("/api/v1/auth/register", RegisterRequest{
 		Username: username, Email: email, Password: password, FullName: fullName,
 	})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	var tok TokenResponse
-	if err := json.Unmarshal(resp, &tok); err != nil {
-		return "", err
+	var auth AuthResponse
+	if err := json.Unmarshal(resp, &auth); err != nil {
+		return nil, err
 	}
-	c.token = tok.Token
-	return tok.Token, nil
+	c.token = auth.Token
+	return &auth, nil
 }
 
 func (c *Client) GetCurrentUser() (*User, error) {

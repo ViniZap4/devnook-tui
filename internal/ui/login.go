@@ -141,11 +141,11 @@ func (m loginModel) submitLogin(client *api.Client) (loginModel, tea.Cmd) {
 	m.loading = true
 	m.err = ""
 	return m, func() tea.Msg {
-		token, err := client.Login(username, password)
+		auth, err := client.Login(username, password)
 		if err != nil {
 			return loginErrMsg{err: err.Error()}
 		}
-		return loginSuccessMsg{token: token}
+		return loginSuccessMsg{token: auth.Token, user: &auth.User}
 	}
 }
 
@@ -161,11 +161,11 @@ func (m loginModel) submitSetup(client *api.Client) (loginModel, tea.Cmd) {
 	m.loading = true
 	m.err = ""
 	return m, func() tea.Msg {
-		token, err := client.Setup(username, email, password, fullName)
+		auth, err := client.Setup(username, email, password, fullName)
 		if err != nil {
 			return loginErrMsg{err: err.Error()}
 		}
-		return loginSuccessMsg{token: token}
+		return loginSuccessMsg{token: auth.Token, user: &auth.User}
 	}
 }
 
