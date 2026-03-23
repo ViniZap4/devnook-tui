@@ -22,6 +22,7 @@ type dashboardModel struct {
 	user      *api.User
 	repos     []api.Repo
 	shortcuts []api.Shortcut
+	orgs      []api.Organization
 	tab       tab
 	cursor    int
 	scroll    int
@@ -77,6 +78,16 @@ func (m dashboardModel) Update(msg tea.Msg) (dashboardModel, tea.Cmd) {
 			m.tab = tabShortcuts
 			m.cursor = 0
 			m.scroll = 0
+		}
+
+		// Enter to open selected repo
+		if key.Matches(msg, keys.Enter) && m.tab == tabRepos {
+			if m.cursor < len(m.repos) {
+				r := m.repos[m.cursor]
+				return m, func() tea.Msg {
+					return openRepoMsg{owner: r.Owner, name: r.Name}
+				}
+			}
 		}
 
 		maxIdx := m.listLen() - 1
